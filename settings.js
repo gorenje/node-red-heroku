@@ -91,6 +91,16 @@ var settings = module.exports = {
         ]
     },
 
+    logging: {
+        console: {
+            level: "info",
+            /** Whether or not to include metric events in the log output */
+            metrics: false,
+            /** Whether or not to include audit events in the log output */
+            audit: false
+        }
+    },
+
     // Disbled Credential Secret
     credentialSecret: false
 }
