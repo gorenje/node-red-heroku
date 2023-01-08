@@ -5,7 +5,7 @@ A wrapper for deploying [Node-RED](http://nodered.org) into the [Heroku](https:/
 
 ### Update
 
-This is the same as the [forked repo](https://github.com/joeartsea/node-red-heroku)
+This is the same as the [forked repo](https://github.com/joeartsea/node-red-heroku) except for:
 
 - using basic postgres pg database
 - securing the Node-Red dashboard with separate user/password
