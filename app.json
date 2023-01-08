@@ -1,9 +1,9 @@
 {
-  "name": "Node-RED",
+  "name": "Node-RED-v3",
   "description": "A visual tool for wiring the Internet of Things.",
   "keywords": [ "Node-RED", "IoT", "Internet of Things", "node.js", "node" ],
   "website": "http://nodered.org/",
-  "repository": "https://github.com/joeartsea/node-red-heroku.git",
+  "repository": "https://github.com/gorenje/node-red-heroku.git",
   "logo": "http://nodered.org/node-red.png",
   "success_url": "/",
   "env": {
@@ -18,9 +18,9 @@
   },
   "addons": [
     {
-      "plan": "heroku-postgresql:hobby-dev",
+      "plan": "heroku-postgresql:basic",
       "options": {
-        "version": "12"
+        "version": "14"
       }
     }
   ]
