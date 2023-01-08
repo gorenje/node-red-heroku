@@ -18,32 +18,6 @@ var path = require("path");
 var when = require("when");
 var pgutil = require('./pgutil');
 
-const basicAuth = require('express-basic-auth');
-function getUnauthorizedResponse(req) {
-    return req.auth
-        ? ('Credentials ' + req.auth.user + ':' + req.auth.password + ' rejected')
-        : 'No credentials provided'
-}
-
-// Add rate limiting middleware to inhibit brute forcing
-const { RateLimiterMemory } = require('rate-limiter-flexible');
-const rateLimiter = new RateLimiterMemory({
-    points: 5, // 5 requests
-    duration: 30, // per 30 seconds
-});
-const rateLimiterMiddleware = (req, res, next) => {
-    rateLimiter.consume(req.ip)
-        .then(() => {
-            next();
-        })
-        .catch(() => {
-            res.status(429).send('Too Many Requests');
-        });
-};
-
-var usersHeroku = {};
-usersHeroku[process.env.NODE_RED_DASHBOARD_USERNAME] = process.env.NODE_RED_DASHBOARD_PASSWORD;
-
 process.env.NODE_RED_HOME = __dirname;
 
 var settings = module.exports = {
@@ -78,19 +52,6 @@ var settings = module.exports = {
         methods: "GET,PUT,POST,DELETE"
     },
 
-    ui: {
-        path: "/ui",
-        middleware: [
-            rateLimiterMiddleware,
-            basicAuth({
-              users: usersHeroku,
-                challenge: true,
-                realm: 'Dashboard UI',
-                unauthorizedResponse: getUnauthorizedResponse
-            })
-        ]
-    },
-
     logging: {
         console: {
             level: "info",
@@ -103,7 +64,51 @@ var settings = module.exports = {
 
     // Disbled Credential Secret
     credentialSecret: false
-}
+};
+
+
+if (process.env.NODE_RED_DASHBOARD_USERNAME && process.env.NODE_RED_DASHBOARD_PASSWORD) {
+
+  var usersHeroku = {};
+
+  const basicAuth = require('express-basic-auth');
+  function getUnauthorizedResponse(req) {
+    return req.auth
+        ? ('Credentials ' + req.auth.user + ':' + req.auth.password + ' rejected')
+        : 'No credentials provided'
+  };
+
+  // Add rate limiting middleware to inhibit brute forcing
+  const { RateLimiterMemory } = require('rate-limiter-flexible');
+  const rateLimiter = new RateLimiterMemory({
+    points: 5, // 5 requests
+    duration: 30, // per 30 seconds
+  });
+  const rateLimiterMiddleware = (req, res, next) => {
+    rateLimiter.consume(req.ip)
+        .then(() => {
+            next();
+        })
+        .catch(() => {
+            res.status(429).send('Too Many Requests');
+        });
+  };
+
+  usersHeroku[process.env.NODE_RED_DASHBOARD_USERNAME] = process.env.NODE_RED_DASHBOARD_PASSWORD;
+
+  settings.ui = {
+        path: "/ui",
+        middleware: [
+            rateLimiterMiddleware,
+            basicAuth({
+              users: usersHeroku,
+                challenge: true,
+                realm: 'Dashboard UI',
+                unauthorizedResponse: getUnauthorizedResponse
+            })
+        ]
+  };
+};
 
 if (process.env.NODE_RED_USERNAME && process.env.NODE_RED_PASSWORD) {
     settings.adminAuth = {
