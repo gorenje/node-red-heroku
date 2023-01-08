@@ -83,7 +83,7 @@ var settings = module.exports = {
         middleware: [
             rateLimiterMiddleware,
             basicAuth({
-              users: usersHeroku.
+              users: usersHeroku,
                 challenge: true,
                 realm: 'Dashboard UI',
                 unauthorizedResponse: getUnauthorizedResponse
