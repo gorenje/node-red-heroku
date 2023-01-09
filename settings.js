@@ -43,7 +43,10 @@ var settings = module.exports = {
     // Serve up the welcome page
     httpStatic: path.join(__dirname,"public"),
 
-    functionGlobalContext: { },
+    functionGlobalContext: {
+      urlModule: require('url'),
+      cryptoModule: require('crypto'),
+    },
 
     storageModule: require("./pgstorage"),
 
