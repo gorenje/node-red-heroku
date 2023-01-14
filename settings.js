@@ -46,6 +46,7 @@ var settings = module.exports = {
     functionGlobalContext: {
       urlModule: require('url'),
       cryptoModule: require('crypto'),
+      openai: require('openai'),
     },
 
     storageModule: require("./pgstorage"),
