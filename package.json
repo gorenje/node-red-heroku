@@ -22,6 +22,8 @@
       "node-red-node-ui-list": "~0.3.6",
       "rate-limiter-flexible": "~2.4.1",
       "node-red-node-markdown": "~0.1.4",
-      "openai": "latest"
+      "openai": "latest",
+      "moment": "^2.29.4",
+      "node-red-contrib-moment": "~4.0.0"
     }
 }
