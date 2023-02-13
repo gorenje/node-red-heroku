@@ -20,6 +20,7 @@
       "node-red-dashboard": "~3.3.0",
       "express-basic-auth": "~1.2.1",
       "node-red-node-ui-list": "~0.3.6",
+      "node-red-node-ui-table": "~0.4.3",
       "rate-limiter-flexible": "~2.4.1",
       "node-red-node-markdown": "~0.1.4",
       "openai": "latest",
