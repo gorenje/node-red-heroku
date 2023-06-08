@@ -116,6 +116,76 @@ if (process.env.NODE_RED_DASHBOARD_USERNAME && process.env.NODE_RED_DASHBOARD_PA
   };
 };
 
+if ( process.env.NODE_RED_CUSTOM_DASHBOARD_DOMAIN ) {
+  const ensureHostnameDashboard = (req, res, next) => {
+    if ( req.hostname == process.env.NODE_RED_CUSTOM_DASHBOARD_DOMAIN ) {
+      next();
+    } else {
+      res.status(404).send("Not Found");
+    }
+  };
+
+
+  const ensureHostnameFlowEditor = (req,res,next) => {
+    const errBody = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n"+
+                    "<meta charset=\"utf-8\">\n<title>Error</title>\n"+
+                    "</head>\n<body>\n<pre>Cannot GET "+req.baseUrl+
+                    "</pre>\n</body>\n</html>\n";
+
+    if ( req.hostname != process.env.NODE_RED_CUSTOM_DASHBOARD_DOMAIN ) {
+      next();
+    } else {
+      res.status(404).send(errBody);
+    }
+  };
+
+
+  if ( settings.ui ) {
+    settings.ui.path = "/";
+    settings.middleware = [
+      ensureHostnameDashboard,
+      ...settings.middleware
+    ];
+  } else {
+    // Add rate limiting middleware to inhibit brute forcing
+    const { RateLimiterMemory } = require('rate-limiter-flexible');
+
+    const rateLimiter = new RateLimiterMemory({
+      points: 5, // 5 requests
+      duration: 30, // per 30 seconds
+    });
+
+    const rateLimiterMiddleware = (req, res, next) => {
+      rateLimiter.consume(req.ip)
+                 .then(() => {
+                   next();
+                 })
+                 .catch(() => {
+                   res.status(429).send('Too Many Requests');
+                 });
+    };
+
+    settings.ui = {
+      path: "/",
+      middleware: [
+        ensureHostnameDashboard,
+        rateLimiterMiddleware
+      ]
+    }
+  }
+
+  if ( settings.httpAdminMiddleware ) {
+    settings.httpAdminMiddleware = [
+      ensureHostnameFlowEditor,
+      ...settings.httpAdminMiddleware
+    ];
+  } else {
+    settings.httpAdminMiddleware = [
+      ensureHostnameFlowEditor
+    ];
+  }
+}
+
 if (process.env.NODE_RED_USERNAME && process.env.NODE_RED_PASSWORD) {
     settings.adminAuth = {
         type: "credentials",
